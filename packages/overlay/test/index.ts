@@ -87,7 +87,7 @@ export const runOverlayTriggerTests = (type: string): void => {
                                                     class="options-popover-content"
                                                 >
                                                     Another Popover
-                                                    <sp-button>
+                                                    <sp-button id="nothing">
                                                         Does nothing
                                                     </sp-button>
                                                 </sp-dialog>
@@ -135,6 +135,66 @@ export const runOverlayTriggerTests = (type: string): void => {
                 this.hoverContent = this.testDiv.querySelector(
                     '#hover-content'
                 ) as HTMLDivElement;
+            });
+
+            it('focus previous "modal" when closing nested "modal"', async function () {
+                this.outerTrigger.type = 'modal';
+                this.innerTrigger.type = 'modal';
+                await elementUpdated(this.outerTrigger);
+                await elementUpdated(this.innerTrigger);
+
+                expect(
+                    await isOnTopLayer(this.outerClickContent),
+                    'outer click content not available at point'
+                ).to.be.false;
+                expect(
+                    await isOnTopLayer(this.innerClickContent),
+                    'inner click content not available at point'
+                ).to.be.false;
+
+                const outerOpen = oneEvent(this.outerButton, 'sp-opened');
+                this.outerButton.click();
+                await outerOpen;
+
+                expect(
+                    await isOnTopLayer(this.outerClickContent),
+                    'outer click content available at point'
+                ).to.be.true;
+                expect(
+                    await isOnTopLayer(this.innerClickContent),
+                    'inner click content available at point'
+                ).to.be.false;
+
+                const innerOpen = oneEvent(this.innerButton, 'sp-opened');
+                this.innerButton.click();
+                await innerOpen;
+
+                expect(
+                    await isOnTopLayer(this.outerClickContent),
+                    'outer click content available at point'
+                ).to.be.true;
+                expect(
+                    await isOnTopLayer(this.innerClickContent),
+                    'inner click content available at point'
+                ).to.be.true;
+
+                const innerClose = oneEvent(this.innerTrigger, 'sp-closed');
+                this.innerTrigger.open = false;
+                await innerClose;
+
+                expect(
+                    await isOnTopLayer(this.outerClickContent),
+                    'outer click content available at point'
+                ).to.be.true;
+                expect(
+                    await isOnTopLayer(this.innerClickContent),
+                    'inner click content not available at point'
+                ).to.be.false;
+
+                expect(
+                    document.activeElement === this.innerButton,
+                    `outer popover recieved focus: ${document.activeElement?.id}`
+                ).to.be.true;
             });
 
             it('opens a popover', async function () {
@@ -378,80 +438,6 @@ export const runOverlayTriggerTests = (type: string): void => {
                 expect(
                     await isOnTopLayer(this.innerClickContent),
                     'inner click content available at point'
-                ).to.be.true;
-            });
-
-            it('focus previous "modal" when closing nested "modal"', async function () {
-                this.outerTrigger.type = 'modal';
-                this.innerTrigger.type = 'modal';
-
-                expect(
-                    await isOnTopLayer(this.outerClickContent),
-                    'outer click content not available at point'
-                ).to.be.false;
-                expect(
-                    await isOnTopLayer(this.innerClickContent),
-                    'inner click content not available at point'
-                ).to.be.false;
-
-                const outerOpen = oneEvent(this.outerButton, 'sp-opened');
-                this.outerButton.click();
-                await outerOpen;
-
-                expect(
-                    await isOnTopLayer(this.outerClickContent),
-                    'outer click content available at point'
-                ).to.be.true;
-                expect(
-                    await isOnTopLayer(this.innerClickContent),
-                    'inner click content available at point'
-                ).to.be.false;
-
-                const innerOpen = oneEvent(this.innerButton, 'sp-opened');
-                this.innerButton.click();
-                await innerOpen;
-
-                expect(
-                    await isOnTopLayer(this.outerClickContent),
-                    'outer click content available at point'
-                ).to.be.true;
-                expect(
-                    await isOnTopLayer(this.innerClickContent),
-                    'inner click content available at point'
-                ).to.be.true;
-
-                // Why does this make the test pass in Chromium? 🤷🏻‍♂️
-                await sendKeys({
-                    press: 'Space',
-                });
-
-                expect(
-                    await isOnTopLayer(this.outerClickContent),
-                    'outer click content available at point'
-                ).to.be.true;
-                expect(
-                    await isOnTopLayer(this.innerClickContent),
-                    'inner click content available at point'
-                ).to.be.true;
-
-                const innerClose = oneEvent(this.innerButton, 'sp-closed');
-                await sendKeys({
-                    press: 'Escape',
-                });
-                await innerClose;
-
-                expect(
-                    await isOnTopLayer(this.outerClickContent),
-                    'outer click content available at point'
-                ).to.be.true;
-                expect(
-                    await isOnTopLayer(this.innerClickContent),
-                    'inner click content not available at point'
-                ).to.be.false;
-
-                expect(
-                    document.activeElement === this.innerButton,
-                    'outer popover recieved focus'
                 ).to.be.true;
             });
 

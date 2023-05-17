@@ -351,7 +351,11 @@ export class AbstractOverlay extends SpectrumElement {
             overlay.placement = options.placement;
             overlay.willPreventClose = !!options.notImmediatelyClosable;
             trigger.insertAdjacentElement('afterend', overlay);
-            await overlay.updateComplete;
+            // Wait until updates no longer trigger updates.
+            const done = await overlay.updateComplete;
+            if (!done) {
+                await overlay.updateComplete;
+            }
             overlay.open = true;
             return overlay.dispose;
         }
@@ -366,9 +370,15 @@ export class AbstractOverlay extends SpectrumElement {
         overlay.offset = options.offset ?? 6;
         overlay.placement = options.placement;
         overlay.willPreventClose = !!options.notImmediatelyClosable;
-        overlay.updateComplete.then(() => {
-            // Do we want to "open" this path, or leave that to the consumer?
-            overlay.open = true;
+        // Wait until updates no longer trigger updates.
+        overlay.updateComplete.then(async (done) => {
+            if (!done) {
+                await overlay.updateComplete;
+            }
+            requestAnimationFrame(() => {
+                // Do we want to "open" this path, or leave that to the consumer?
+                overlay.open = true;
+            });
         });
         return overlay;
     }
