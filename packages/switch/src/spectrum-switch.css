@@ -381,7 +381,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host(:active) #input + #switch:before {
+:host([active]) #input + #switch:before {
     border-color: var(
         --highcontrast-switch-handle-border-color-down,
         var(
@@ -390,7 +390,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host(:active) #input ~ #label {
+:host([active]) #input ~ #label {
     color: var(
         --highcontrast-switch-label-color-down,
         var(
@@ -399,7 +399,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host(:active[checked]) #input:enabled + #switch {
+:host([active][checked]) #input:enabled + #switch {
     background-color: var(
         --highcontrast-switch-background-color-selected-down,
         var(
@@ -408,7 +408,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host(:active[checked]) #input:enabled + #switch:before {
+:host([active][checked]) #input:enabled + #switch:before {
     border-color: var(
         --highcontrast-switch-handle-border-color-selected-down,
         var(

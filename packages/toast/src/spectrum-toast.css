@@ -126,7 +126,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='negative']) .closeButton.focus-visible:not(:active) {
+:host([variant='negative']) .closeButton.focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-negative-background-color-default,
         var(
@@ -135,7 +135,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='negative']) .closeButton:focus-visible:not(:active) {
+:host([variant='negative']) .closeButton:focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-negative-background-color-default,
         var(
@@ -160,7 +160,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='info']) .closeButton.focus-visible:not(:active) {
+:host([variant='info']) .closeButton.focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-informative-background-color-default,
         var(
@@ -169,7 +169,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='info']) .closeButton:focus-visible:not(:active) {
+:host([variant='info']) .closeButton:focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-informative-background-color-default,
         var(
@@ -194,7 +194,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='positive']) .closeButton.focus-visible:not(:active) {
+:host([variant='positive']) .closeButton.focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-positive-background-color-default,
         var(
@@ -203,7 +203,7 @@ governing permissions and limitations under the License.
         )
     );
 }
-:host([variant='positive']) .closeButton:focus-visible:not(:active) {
+:host([variant='positive']) .closeButton:focus-visible:not([active]) {
     color: var(
         --highcontrast-toast-positive-background-color-default,
         var(

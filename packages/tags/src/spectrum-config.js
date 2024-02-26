@@ -49,10 +49,6 @@ const config = {
             fileName: 'tag',
             components: [
                 {
-                    find: builder.pseudoClass('active'),
-                    hoist: true,
-                },
-                {
                     find: builder.pseudoClass('focus-visible'),
                     hoist: true,
                 },
@@ -83,6 +79,7 @@ const config = {
                 converter.classToClass('spectrum-Tag-itemLabel', 'label'),
                 converter.classToSlotted('spectrum-Avatar', 'avatar'),
                 converter.classToSlotted('spectrum-Tag-itemIcon', 'icon'),
+                converter.pseudoToAttribute('active', 'active'),
             ],
         },
     ],

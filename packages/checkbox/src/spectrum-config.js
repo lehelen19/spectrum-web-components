@@ -45,6 +45,7 @@ const config = {
                 converter.classToId('spectrum-Checkbox-checkmark'),
                 converter.classToId('spectrum-Checkbox-partialCheckmark'),
                 converter.classToId('spectrum-Checkbox-label'),
+                converter.pseudoToAttribute('active', 'active'),
                 {
                     find: [
                         {

@@ -40,6 +40,12 @@ export class Tag extends SizedMixin(SpectrumElement, {
         return [styles];
     }
 
+    /**
+     * Whether the form field is currently being interacted with
+     */
+    @property({ type: Boolean, reflect: true })
+    public active = false;
+
     @property({ type: Boolean, reflect: true })
     public deletable = false;
 
@@ -52,19 +58,33 @@ export class Tag extends SizedMixin(SpectrumElement, {
     constructor() {
         super();
         this.addEventListener('focusin', this.handleFocusin);
+        this.addEventListener('pointerdown', this.handlePointerdown);
     }
 
-    private handleFocusin = (): void => {
+    private handleFocusin(): void {
         this.addEventListener('focusout', this.handleFocusout);
         this.addEventListener('keydown', this.handleKeydown);
-    };
+    }
 
-    private handleFocusout = (): void => {
+    private handleFocusout(): void {
         this.removeEventListener('keydown', this.handleKeydown);
         this.removeEventListener('focusout', this.handleFocusout);
-    };
+    }
 
-    private handleKeydown = (event: KeyboardEvent): void => {
+    private handlePointerdown(event: PointerEvent): void {
+        if (event.button !== 0) return;
+
+        const handlePointerup = (): void => {
+            document.removeEventListener('pointerup', handlePointerup);
+            document.removeEventListener('pointercancel', handlePointerup);
+            this.active = false;
+        };
+        document.addEventListener('pointerup', handlePointerup);
+        document.addEventListener('pointercancel', handlePointerup);
+        this.active = true;
+    }
+
+    private handleKeydown(event: KeyboardEvent): void {
         if (!this.deletable || this.disabled) {
             return;
         }
@@ -78,7 +98,7 @@ export class Tag extends SizedMixin(SpectrumElement, {
             default:
                 return;
         }
-    };
+    }
 
     private delete(): void {
         if (this.readonly) {

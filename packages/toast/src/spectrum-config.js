@@ -11,7 +11,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-import { converterFor } from '../../../tasks/process-spectrum-utils.js';
+import {
+    builder,
+    converterFor,
+} from '../../../tasks/process-spectrum-utils.js';
 
 const converter = converterFor('spectrum-Toast');
 
@@ -43,6 +46,18 @@ const config = {
                 converter.classToClass('spectrum-Toast-typeIcon', 'type'),
                 converter.classToClass('spectrum-Toast-closeButton'),
                 converter.classToSlotted('spectrum-Button', 'action'),
+                {
+                    find: {
+                        type: 'pseudo-class',
+                        kind: 'not',
+                        selectors: [[builder.pseudoClass('active')]],
+                    },
+                    replace: {
+                        type: 'pseudo-class',
+                        kind: 'not',
+                        selectors: [[builder.attribute('active')]],
+                    },
+                },
             ],
         },
     ],

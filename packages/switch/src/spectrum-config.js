@@ -42,11 +42,7 @@ const config = {
                         },
                     ],
                 },
-                {
-                    find: builder.pseudoClass('active'),
-                    replace: builder.pseudoClass('active'),
-                    hoist: true,
-                },
+                converter.pseudoToAttribute('active', 'active'),
                 converter.classToHost(),
                 // Default to `size='m'` without needing the attribute
                 converter.classToHost('spectrum-Switch--sizeM'),

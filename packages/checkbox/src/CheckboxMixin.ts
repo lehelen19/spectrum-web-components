@@ -36,6 +36,12 @@ export function CheckboxMixin<T extends Constructor<ReactiveElement>>(
     constructor: T
 ): T & Constructor<CheckboxElement> {
     class MixedElement extends constructor {
+        /**
+         * Whether the form field is currently being interacted with
+         */
+        @property({ type: Boolean, reflect: true })
+        public active = false;
+
         @property({ type: Boolean, reflect: true })
         public checked = false;
 
@@ -47,6 +53,29 @@ export function CheckboxMixin<T extends Constructor<ReactiveElement>>(
 
         @query('#input')
         inputElement!: HTMLInputElement;
+
+        public override connectedCallback(): void {
+            super.connectedCallback();
+            this.addEventListener('pointerdown', this.handlePointerdown);
+        }
+
+        public override disconnectedCallback(): void {
+            super.disconnectedCallback();
+            this.removeEventListener('pointerdown', this.handlePointerdown);
+        }
+
+        private handlePointerdown(event: PointerEvent): void {
+            if (event.button !== 0) return;
+
+            const handlePointerup = (): void => {
+                document.removeEventListener('pointerup', handlePointerup);
+                document.removeEventListener('pointercancel', handlePointerup);
+                this.active = false;
+            };
+            document.addEventListener('pointerup', handlePointerup);
+            document.addEventListener('pointercancel', handlePointerup);
+            this.active = true;
+        }
 
         public handleChange(): void {
             if (this.readonly) {
