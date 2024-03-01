@@ -24,6 +24,14 @@ interface ItemSize {
     height: number;
 }
 
+const doCallbackAfterPaint = (cb: () => void): void => {
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            cb();
+        });
+    });
+};
+
 export class GridController<T extends HTMLElement>
     implements ReactiveController
 {
@@ -171,15 +179,10 @@ export class GridController<T extends HTMLElement>
     }
 
     protected handleFocusin = (event: FocusEvent): void => {
-        const doCallbackAfterPaint = (cb: () => void): void => {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    cb();
-                });
-            });
-        };
+        console.log('focusin', performance.now());
         const scrollToFirst = (): void => this.host.scrollToIndex(0);
         const focusIntoGrid = (): void => {
+            console.log(0, performance.now());
             this.focus();
             this.host.tabIndex = -1;
         };
@@ -219,6 +222,7 @@ export class GridController<T extends HTMLElement>
             'visibilityChanged',
             this.handleVisibleChanged
         );
+        console.log('connected', performance.now());
         this.host.addEventListener('focusin', this.handleFocusin);
         this.host.addEventListener('focusout', this.handleFocusout);
         this.host.tabIndex = 0;
@@ -231,6 +235,7 @@ export class GridController<T extends HTMLElement>
             'visibilityChanged',
             this.handleVisibleChanged
         );
+        console.log('disconnected', performance.now());
         this.host.removeEventListener('focusin', this.handleFocusin);
         this.host.removeEventListener('focusout', this.handleFocusout);
     }

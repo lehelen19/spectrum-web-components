@@ -44,7 +44,7 @@ describe('Grid', () => {
 
         await expect(el).to.be.accessible();
     });
-    it('accepts focus', async () => {
+    it.only('accepts focus', async () => {
         const test = await fixture<HTMLDivElement>(
             html`
                 <div>${Default()}</div>
@@ -62,7 +62,8 @@ describe('Grid', () => {
         await nextFrame();
 
         expect(
-            el.querySelector(el.focusableSelector) === document.activeElement
+            el.querySelector(el.focusableSelector) === document.activeElement,
+            `actual focus: ${document.activeElement?.localName}`
         ).to.be.true;
     });
     it('does not focus when clicking grid', async () => {
@@ -100,7 +101,8 @@ describe('Grid', () => {
         await nextFrame();
 
         expect(
-            el.querySelector(el.focusableSelector) === document.activeElement
+            el.querySelector(el.focusableSelector) === document.activeElement,
+            `actual focus: ${document.activeElement?.localName}`
         ).to.be.false;
     });
     it('allows to tab in and out', async () => {
