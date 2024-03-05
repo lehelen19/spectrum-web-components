@@ -184,8 +184,16 @@ export class LayoutElement extends LitElement {
         (await this.themeRoot).startManagingContentDirection(el);
     }
 
+    public async startManagingContentVersion(el: HTMLElement): Promise<void> {
+        (await this.themeRoot).startManagingContentVersion(el);
+    }
+
     public async stopManagingContentDirection(el: HTMLElement): Promise<void> {
         (await this.themeRoot).stopManagingContentDirection(el);
+    }
+
+    public async stopManagingContentVersion(el: HTMLElement): Promise<void> {
+        (await this.themeRoot).stopManagingContentVersion(el);
     }
 
     private _themeTrackers = new Map<HTMLElement, TrackTheme['callback']>();
@@ -234,6 +242,10 @@ export class LayoutElement extends LitElement {
         const dir = (event.target as Picker).value;
         this.dir = dir === 'rtl' ? dir : 'ltr';
         document.documentElement.dir = this.dir;
+    }
+
+    private updateVersion(event: Event) {
+        this.version = (event.target as Picker).value as Version;
     }
 
     private handleTrackTheme(event: CustomEvent<TrackTheme>): void {
