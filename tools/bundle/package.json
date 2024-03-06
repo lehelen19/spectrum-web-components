@@ -131,7 +131,7 @@
         "@spectrum-web-components/tooltip": "^0.41.1",
         "@spectrum-web-components/top-nav": "^0.41.1",
         "@spectrum-web-components/tray": "^0.41.1",
-        "@spectrum-web-components/truncated": "^0.41.0",
+        "@spectrum-web-components/truncated": "^0.0.1",
         "@spectrum-web-components/underlay": "^0.41.1"
     },
     "types": "./src/index.d.ts",
