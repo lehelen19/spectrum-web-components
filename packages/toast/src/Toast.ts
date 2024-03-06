@@ -215,7 +215,7 @@ export class Toast extends SpectrumElement {
                 <sp-close-button
                     @click=${this.shouldClose}
                     label="Close"
-                    variant="white"
+                    static="white"
                 ></sp-close-button>
             </div>
         `;
