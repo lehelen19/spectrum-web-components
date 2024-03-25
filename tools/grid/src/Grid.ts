@@ -17,6 +17,7 @@ import {
     PropertyValues,
     ReactiveElement,
     render,
+    RootPart,
     TemplateResult,
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
@@ -34,6 +35,8 @@ export class Grid extends LitVirtualizer {
     public static override get styles(): CSSResultArray {
         return [styles];
     }
+
+    private __gridPart: RootPart | undefined = undefined;
 
     @property({ type: String })
     public focusableSelector!: string;
@@ -154,6 +157,7 @@ export class Grid extends LitVirtualizer {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this.__gridPart?.setConnected(true);
         this.addEventListener('change', this.handleChange, { capture: true });
     }
 
@@ -161,6 +165,7 @@ export class Grid extends LitVirtualizer {
         this.removeEventListener('change', this.handleChange, {
             capture: true,
         });
+        this.__gridPart?.setConnected(false);
         super.disconnectedCallback();
     }
 }
