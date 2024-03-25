@@ -96,7 +96,7 @@ export class Menu extends SizedMixin(SpectrumElement) {
     @query('slot:not([name])')
     public menuSlot!: HTMLSlotElement;
 
-    private childItemSet = new Set<MenuItem>();
+    private childItemMap = new Map<number, WeakRef<MenuItem>>();
     public focusedItemIndex = 0;
     public focusInItemIndex = 0;
 
@@ -111,6 +111,11 @@ export class Menu extends SizedMixin(SpectrumElement) {
 
     private cachedChildItems: MenuItem[] | undefined;
 
+    private childMenuItemMapHas(menuItem: MenuItem): boolean {
+        const ref = this.childItemMap.get(menuItem.__swcMenuItemId);
+        return !!ref?.deref();
+    }
+
     private updateCachedMenuItems(): MenuItem[] {
         this.cachedChildItems = [];
 
@@ -122,7 +127,7 @@ export class Menu extends SizedMixin(SpectrumElement) {
                     : ([...slotElement.querySelectorAll(`*`)] as MenuItem[]);
 
             for (const childMenuItem of childMenuItems) {
-                if (this.childItemSet.has(childMenuItem)) {
+                if (this.childMenuItemMapHas(childMenuItem)) {
                     this.cachedChildItems.push(childMenuItem);
                 }
             }
@@ -244,12 +249,12 @@ export class Menu extends SizedMixin(SpectrumElement) {
     }
 
     private addChildItem(item: MenuItem): void {
-        this.childItemSet.add(item);
+        this.childItemMap.set(item.__swcMenuItemId, new WeakRef(item));
         this.handleItemsChanged();
     }
 
     private async removeChildItem(item: MenuItem): Promise<void> {
-        this.childItemSet.delete(item);
+        this.childItemMap.delete(item.__swcMenuItemId);
         this.cachedChildItems = undefined;
         if (item.focused) {
             this.handleItemsChanged();
@@ -437,7 +442,7 @@ export class Menu extends SizedMixin(SpectrumElement) {
         }
         const openedItem = event
             .composedPath()
-            .find((el) => this.childItemSet.has(el as MenuItem));
+            .find((el) => this.childMenuItemMapHas(el as MenuItem));
         /* c8 ignore next 1 */
         if (!openedItem) return;
         const openedItemIndex = this.childItems.indexOf(openedItem as MenuItem);
@@ -472,14 +477,18 @@ export class Menu extends SizedMixin(SpectrumElement) {
             const selected: string[] = [];
             const selectedItems: MenuItem[] = [];
 
-            this.childItemSet.forEach((childItem) => {
-                if (childItem.menuData.selectionRoot !== this) return;
-
-                if (this.selectedItemsMap.has(childItem)) {
-                    selected.push(childItem.value);
-                    selectedItems.push(childItem);
+            for (const [, ref] of this.childItemMap) {
+                const childItem = ref.deref();
+                if (childItem) {
+                    if (
+                        childItem.menuData.selectionRoot === this &&
+                        this.selectedItemsMap.has(childItem)
+                    ) {
+                        selected.push(childItem.value);
+                        selectedItems.push(childItem);
+                    }
                 }
-            });
+            }
             this.selected = selected;
             this.selectedItems = selectedItems;
             this.value = this.selected.join(this.valueSeparator);
@@ -818,9 +827,12 @@ export class Menu extends SizedMixin(SpectrumElement) {
         const updates: Promise<unknown>[] = [
             new Promise((res) => requestAnimationFrame(() => res(true))),
         ];
-        this.childItemSet.forEach((childItem) => {
-            updates.push(childItem.triggerUpdate());
-        });
+        for (const [, ref] of this.childItemMap) {
+            const childItem = ref.deref();
+            if (childItem) {
+                updates.push(childItem.triggerUpdate());
+            }
+        }
         this.childItemsUpdated = Promise.all(updates);
     }
 
