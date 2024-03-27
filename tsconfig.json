@@ -8,7 +8,7 @@
         "importHelpers": true,
         "inlineSources": true,
         "isolatedModules": true,
-        "lib": ["es2018", "dom", "dom.iterable", "es2021.WeakRef"],
+        "lib": ["es2018", "dom", "dom.iterable"],
         "module": "esNext",
         "moduleResolution": "node",
         "noImplicitOverride": true,
