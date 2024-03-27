@@ -97,10 +97,6 @@ export class MenuItem extends LikeAnchor(
 
     abortControllerSubmenu!: AbortController;
 
-    static nextId = 0;
-
-    public __swcMenuItemId = MenuItem.nextId++;
-
     @property({ type: Boolean, reflect: true })
     public active = false;
 
