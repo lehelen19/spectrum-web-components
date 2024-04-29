@@ -135,11 +135,7 @@ class OverlayStack {
 
     /**
      * When overlays are added manage the open state of exisiting overlays appropriately:
-     * - 'modal': should close other overlays
-     * - 'page': should close other overlays
      * - 'hint': shouldn't close other overlays and give way to all other overlays on a trigger
-     * - 'auto': should close other 'auto' overlays and other 'hint' overlays, but not 'manual' overlays
-     * - 'manual': shouldn't close other overlays
      */
     add(overlay: Overlay): void {
         if (this.stack.includes(overlay)) {
@@ -150,32 +146,7 @@ class OverlayStack {
             }
             return;
         }
-        if (
-            overlay.type === 'auto' ||
-            overlay.type === 'modal' ||
-            overlay.type === 'page'
-        ) {
-            // manage closing open overlays
-            const queryPathEventName = 'sp-overlay-query-path';
-            const queryPathEvent = new Event(queryPathEventName, {
-                composed: true,
-                bubbles: true,
-            });
-            overlay.addEventListener(
-                queryPathEventName,
-                (event: Event) => {
-                    const path = event.composedPath();
-                    this.stack.forEach((overlayEl) => {
-                        const inPath = path.find((el) => el === overlayEl);
-                        if (!inPath && overlayEl.type !== 'manual') {
-                            this.closeOverlay(overlayEl);
-                        }
-                    });
-                },
-                { once: true }
-            );
-            overlay.dispatchEvent(queryPathEvent);
-        } else if (overlay.type === 'hint') {
+        if (overlay.type === 'hint') {
             const hasPrevious = this.stack.some((overlayEl) => {
                 return (
                     overlayEl.type !== 'manual' &&
