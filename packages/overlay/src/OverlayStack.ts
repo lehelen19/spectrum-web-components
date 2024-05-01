@@ -85,7 +85,9 @@ class OverlayStack {
             return (
                 !inStack &&
                 !overlay.shouldPreventClose() &&
-                overlay.type !== 'manual'
+                overlay.type !== 'manual' &&
+                // Don't close if this overlay is modal and not on top of the overlay stack.
+                !(overlay.type === 'modal' && this.lastOverlay !== overlay)
             );
         }) as Overlay[];
         nonAncestorOverlays.reverse();
@@ -135,6 +137,10 @@ class OverlayStack {
 
     /**
      * When overlays are added manage the open state of exisiting overlays appropriately:
+     * - 'modal': should close other non-'modal' and non-'manual' overlays
+     * - 'page': should close other non-'modal' and non-'manual' overlays
+     * - 'auto': should close other 'auto' overlays and other 'hint' overlays, but not 'manual' overlays
+     * - 'manual': shouldn't close other overlays
      * - 'hint': shouldn't close other overlays and give way to all other overlays on a trigger
      */
     add(overlay: Overlay): void {
@@ -146,7 +152,36 @@ class OverlayStack {
             }
             return;
         }
-        if (overlay.type === 'hint') {
+        if (
+            overlay.type === 'auto' ||
+            overlay.type === 'modal' ||
+            overlay.type === 'page'
+        ) {
+            // manage closing open overlays
+            const queryPathEventName = 'sp-overlay-query-path';
+            const queryPathEvent = new Event(queryPathEventName, {
+                composed: true,
+                bubbles: true,
+            });
+            overlay.addEventListener(
+                queryPathEventName,
+                (event: Event) => {
+                    const path = event.composedPath();
+                    this.stack.forEach((overlayEl) => {
+                        const inPath = path.find((el) => el === overlayEl);
+                        if (
+                            !inPath &&
+                            overlayEl.type !== 'manual' &&
+                            overlayEl.type !== 'modal'
+                        ) {
+                            this.closeOverlay(overlayEl);
+                        }
+                    });
+                },
+                { once: true }
+            );
+            overlay.dispatchEvent(queryPathEvent);
+        } else if (overlay.type === 'hint') {
             const hasPrevious = this.stack.some((overlayEl) => {
                 return (
                     overlayEl.type !== 'manual' &&
