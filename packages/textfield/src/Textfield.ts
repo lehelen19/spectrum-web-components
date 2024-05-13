@@ -387,6 +387,7 @@ export class TextfieldBase extends ManageHelpText(
                 <div id="form-container" class="input">
                     <form id="form-wrapper" class="input">
                         <input
+                            name=${ifDefined(this.name || undefined)}
                             type=${this.type}
                             aria-describedby=${this.helpTextId}
                             aria-label=${this.label || this.placeholder}
