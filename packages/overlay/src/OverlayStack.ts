@@ -60,13 +60,15 @@ class OverlayStack {
      * @param event {ClickEvent}
      */
     handlePointerup = (): void => {
-        if (!this.stack.length) return;
-        if (!this.pointerdownPath?.length) return;
-
         // Test against the composed path in `pointerdown` in case the visitor moved their
         // pointer during the course of the interaction.
+        // Ensure that this value is cleared even if the work in this method goes undone.
         const composedPath = this.pointerdownPath;
+        const lastOverlay = this.lastOverlay;
         this.pointerdownPath = undefined;
+        this.lastOverlay = undefined;
+        if (!this.stack.length) return;
+        if (!composedPath?.length) return;
         const lastIndex = this.stack.length - 1;
         const nonAncestorOverlays = this.stack.filter((overlay, i) => {
             const inStack = composedPath.find(
@@ -79,7 +81,7 @@ class OverlayStack {
                     // The last Overlay in the stack is not the last Overlay at `pointerdown` time and has a
                     // `triggerInteraction` of "longpress", meaning it was opened by this poitner interaction
                     (i === lastIndex &&
-                        overlay !== this.lastOverlay &&
+                        overlay !== lastOverlay &&
                         overlay.triggerInteraction === 'longpress')
             );
             return (
