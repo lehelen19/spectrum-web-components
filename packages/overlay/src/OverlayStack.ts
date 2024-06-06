@@ -89,7 +89,7 @@ class OverlayStack {
                 !overlay.shouldPreventClose() &&
                 overlay.type !== 'manual' &&
                 // Don't close if this overlay is modal and not on top of the overlay stack.
-                !(overlay.type === 'modal' && this.lastOverlay !== overlay)
+                !(overlay.type === 'modal' && lastOverlay !== overlay)
             );
         }) as Overlay[];
         nonAncestorOverlays.reverse();
