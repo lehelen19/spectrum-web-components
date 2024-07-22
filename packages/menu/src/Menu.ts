@@ -656,7 +656,6 @@ export class Menu extends SizedMixin(SpectrumElement, { noDefaultSize: true }) {
                 childItem &&
                 childItem.menuData.selectionRoot === event.target
             ) {
-                event.preventDefault();
                 childItem.click();
             }
             return;

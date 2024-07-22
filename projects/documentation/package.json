@@ -94,13 +94,11 @@
         "build:eleventy": {
             "command": "eleventy --config=.eleventy.js --incremental --quiet",
             "dependencies": [
-                {
-                    "script": "copy-docs"
-                }
+                "copy-docs"
             ],
             "files": [
-                "./content/**/*",
-                "./.eleventy.js"
+                "./content/**/*.md",
+                "./.eleventy.cjs"
             ],
             "clean": "if-file-deleted",
             "output": [
@@ -213,16 +211,8 @@
             "command": "node scripts/copy-component-docs.js",
             "files": [
                 "../../packages/**/*.md",
-                "../../packages/**/*.ts",
-                "../../packages/**/args.js",
-                "../../packages/**/template.js",
                 "../../tools/**/*.md",
-                "../../tools/**/*.ts",
-                "../../tools/**/args.js",
-                "../../tools/**/template.js",
-                "scripts/gather-wcd-urls.js",
-                "scripts/gather-spectrum-urls.js",
-                "scripts/gather-storybook-urls.js",
+                "custom-elements.json",
                 "scripts/copy-component-docs.js",
                 "scripts/component-template-parts.js"
             ],

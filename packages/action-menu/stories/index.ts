@@ -19,13 +19,11 @@ import '@spectrum-web-components/menu/sp-menu-divider.js';
 import '@spectrum-web-components/menu/sp-menu-item.js';
 import '@spectrum-web-components/tooltip/sp-tooltip.js';
 import { Placement } from '@spectrum-web-components/overlay/src/overlay-types.js';
-import type { ActionMenu } from '@spectrum-web-components/action-menu';
 
 export const ActionMenuMarkup = ({
     align = 'start',
     ariaLabel = 'More Actions',
-    onChange = (() => undefined) as (value: string) => void,
-    changeHandler = (() => undefined) as (value: string) => void,
+    changeHandler = (() => undefined) as (event: Event) => void,
     disabled = false,
     open = false,
     quiet = false,
@@ -50,10 +48,7 @@ export const ActionMenuMarkup = ({
                     : (staticValue as 'black' | 'white')
             )}
             size=${size}
-            @change=${(event: Event & { target: ActionMenu }) => {
-                changeHandler(event.target.value);
-                onChange(event.target.value);
-            }}
+            @change="${changeHandler}"
             .selects=${selects ? selects : undefined}
             value=${selected ? 'Select Inverse' : ''}
             style=${ifDefined(
