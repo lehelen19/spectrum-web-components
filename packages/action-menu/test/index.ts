@@ -14,6 +14,7 @@ import {
     aTimeout,
     elementUpdated,
     expect,
+    fixture,
     html,
     nextFrame,
     oneEvent,
@@ -25,44 +26,23 @@ import { spy } from 'sinon';
 import { ActionMenu } from '@spectrum-web-components/action-menu';
 import type { Menu, MenuItem } from '@spectrum-web-components/menu';
 import {
-    fixture,
     ignoreResizeObserverLoopError,
+    fixture as styledFixture,
 } from '../../../test/testing-helpers.js';
 import '@spectrum-web-components/dialog/sp-dialog-base.js';
-import {
-    iconOnly,
-    tooltipDescriptionAndPlacement,
-} from '../stories/action-menu.stories.js';
+import { tooltipDescriptionAndPlacement } from '../stories/action-menu.stories.js';
 import { findDescribedNode } from '../../../test/testing-helpers-a11y.js';
 import type { Tooltip } from '@spectrum-web-components/tooltip';
 import { sendMouse } from '../../../test/plugins/browser.js';
 import type { TestablePicker } from '../../picker/test/index.js';
 import type { Overlay } from '@spectrum-web-components/overlay';
-import { sendKeys } from '@web/test-runner-commands';
 
 ignoreResizeObserverLoopError(before, after);
 
 const deprecatedActionMenuFixture = async (): Promise<ActionMenu> =>
-    await fixture<ActionMenu>(
-        html`
-            <sp-action-menu label="More Actions">
-                <sp-menu>
-                    <sp-menu-item>Deselect</sp-menu-item>
-                    <sp-menu-item>Select Inverse</sp-menu-item>
-                    <sp-menu-item>Feather...</sp-menu-item>
-                    <sp-menu-item>Select and Mask...</sp-menu-item>
-                    <sp-menu-divider></sp-menu-divider>
-                    <sp-menu-item>Save Selection</sp-menu-item>
-                    <sp-menu-item disabled>Make Work Path</sp-menu-item>
-                </sp-menu>
-            </sp-action-menu>
-        `
-    );
-
-const actionMenuFixture = async (): Promise<ActionMenu> =>
-    await fixture<ActionMenu>(
-        html`
-            <sp-action-menu label="More Actions">
+    await fixture<ActionMenu>(html`
+        <sp-action-menu label="More Actions">
+            <sp-menu>
                 <sp-menu-item>Deselect</sp-menu-item>
                 <sp-menu-item>Select Inverse</sp-menu-item>
                 <sp-menu-item>Feather...</sp-menu-item>
@@ -70,31 +50,40 @@ const actionMenuFixture = async (): Promise<ActionMenu> =>
                 <sp-menu-divider></sp-menu-divider>
                 <sp-menu-item>Save Selection</sp-menu-item>
                 <sp-menu-item disabled>Make Work Path</sp-menu-item>
-            </sp-action-menu>
-        `
-    );
+            </sp-menu>
+        </sp-action-menu>
+    `);
+
+const actionMenuFixture = async (): Promise<ActionMenu> =>
+    await fixture<ActionMenu>(html`
+        <sp-action-menu label="More Actions">
+            <sp-menu-item>Deselect</sp-menu-item>
+            <sp-menu-item>Select Inverse</sp-menu-item>
+            <sp-menu-item>Feather...</sp-menu-item>
+            <sp-menu-item>Select and Mask...</sp-menu-item>
+            <sp-menu-divider></sp-menu-divider>
+            <sp-menu-item>Save Selection</sp-menu-item>
+            <sp-menu-item disabled>Make Work Path</sp-menu-item>
+        </sp-action-menu>
+    `);
 
 const actionSubmenuFixture = async (): Promise<ActionMenu> =>
-    await fixture<ActionMenu>(
-        html`
-            <sp-action-menu label="More Actions">
-                <sp-menu-item>One</sp-menu-item>
-                <sp-menu-item selected id="root-selected-item">
-                    Two
-                </sp-menu-item>
-                <sp-menu-item id="item-with-submenu">
-                    B should be selected
-                    <sp-menu slot="submenu">
-                        <sp-menu-item>A</sp-menu-item>
-                        <sp-menu-item selected id="sub-selected-item">
-                            B
-                        </sp-menu-item>
-                        <sp-menu-item>C</sp-menu-item>
-                    </sp-menu>
-                </sp-menu-item>
-            </sp-action-menu>
-        `
-    );
+    await fixture<ActionMenu>(html`
+        <sp-action-menu label="More Actions">
+            <sp-menu-item>One</sp-menu-item>
+            <sp-menu-item selected id="root-selected-item">Two</sp-menu-item>
+            <sp-menu-item id="item-with-submenu">
+                B should be selected
+                <sp-menu slot="submenu">
+                    <sp-menu-item>A</sp-menu-item>
+                    <sp-menu-item selected id="sub-selected-item">
+                        B
+                    </sp-menu-item>
+                    <sp-menu-item>C</sp-menu-item>
+                </sp-menu>
+            </sp-menu-item>
+        </sp-action-menu>
+    `);
 
 export const testActionMenu = (mode: 'sync' | 'async'): void => {
     describe(`Action menu: ${mode}`, () => {
@@ -108,20 +97,18 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
             await expect(el).to.be.accessible();
         });
         it('loads - [slot="label"]', async () => {
-            const el = await fixture<ActionMenu>(
-                html`
-                    <sp-action-menu>
-                        <span slot="label">More Actions</span>
-                        <sp-menu-item>Deselect</sp-menu-item>
-                        <sp-menu-item>Select Inverse</sp-menu-item>
-                        <sp-menu-item>Feather...</sp-menu-item>
-                        <sp-menu-item>Select and Mask...</sp-menu-item>
-                        <sp-menu-divider></sp-menu-divider>
-                        <sp-menu-item>Save Selection</sp-menu-item>
-                        <sp-menu-item disabled>Make Work Path</sp-menu-item>
-                    </sp-action-menu>
-                `
-            );
+            const el = await fixture<ActionMenu>(html`
+                <sp-action-menu>
+                    <span slot="label">More Actions</span>
+                    <sp-menu-item>Deselect</sp-menu-item>
+                    <sp-menu-item>Select Inverse</sp-menu-item>
+                    <sp-menu-item>Feather...</sp-menu-item>
+                    <sp-menu-item>Select and Mask...</sp-menu-item>
+                    <sp-menu-divider></sp-menu-divider>
+                    <sp-menu-item>Save Selection</sp-menu-item>
+                    <sp-menu-item disabled>Make Work Path</sp-menu-item>
+                </sp-action-menu>
+            `);
 
             await elementUpdated(el);
             await nextFrame();
@@ -130,20 +117,18 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
             await expect(el).to.be.accessible();
         });
         it('loads - [custom icon]', async () => {
-            const el = await fixture<ActionMenu>(
-                html`
-                    <sp-action-menu label="More Actions">
-                        <sp-icon-settings slot="icon"></sp-icon-settings>
-                        <sp-menu-item>Deselect</sp-menu-item>
-                        <sp-menu-item>Select Inverse</sp-menu-item>
-                        <sp-menu-item>Feather...</sp-menu-item>
-                        <sp-menu-item>Select and Mask...</sp-menu-item>
-                        <sp-menu-divider></sp-menu-divider>
-                        <sp-menu-item>Save Selection</sp-menu-item>
-                        <sp-menu-item disabled>Make Work Path</sp-menu-item>
-                    </sp-action-menu>
-                `
-            );
+            const el = await fixture<ActionMenu>(html`
+                <sp-action-menu label="More Actions">
+                    <sp-icon-settings slot="icon"></sp-icon-settings>
+                    <sp-menu-item>Deselect</sp-menu-item>
+                    <sp-menu-item>Select Inverse</sp-menu-item>
+                    <sp-menu-item>Feather...</sp-menu-item>
+                    <sp-menu-item>Select and Mask...</sp-menu-item>
+                    <sp-menu-divider></sp-menu-divider>
+                    <sp-menu-item>Save Selection</sp-menu-item>
+                    <sp-menu-item disabled>Make Work Path</sp-menu-item>
+                </sp-action-menu>
+            `);
 
             await elementUpdated(el);
             await nextFrame();
@@ -154,27 +139,25 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
         it('dispatches change events, no [href]', async () => {
             const changeSpy = spy();
 
-            const el = await fixture<ActionMenu>(
-                html`
-                    <sp-action-menu
-                        label="More Actions"
-                        @change=${({
-                            target: { value },
-                        }: Event & { target: ActionMenu }) => {
-                            changeSpy(value);
-                        }}
-                    >
-                        <sp-icon-settings slot="icon"></sp-icon-settings>
-                        <sp-menu-item>Deselect</sp-menu-item>
-                        <sp-menu-item>Select Inverse</sp-menu-item>
-                        <sp-menu-item>Feather...</sp-menu-item>
-                        <sp-menu-item>Select and Mask...</sp-menu-item>
-                        <sp-menu-divider></sp-menu-divider>
-                        <sp-menu-item>Save Selection</sp-menu-item>
-                        <sp-menu-item disabled>Make Work Path</sp-menu-item>
-                    </sp-action-menu>
-                `
-            );
+            const el = await fixture<ActionMenu>(html`
+                <sp-action-menu
+                    label="More Actions"
+                    @change=${({
+                        target: { value },
+                    }: Event & { target: ActionMenu }) => {
+                        changeSpy(value);
+                    }}
+                >
+                    <sp-icon-settings slot="icon"></sp-icon-settings>
+                    <sp-menu-item>Deselect</sp-menu-item>
+                    <sp-menu-item>Select Inverse</sp-menu-item>
+                    <sp-menu-item>Feather...</sp-menu-item>
+                    <sp-menu-item>Select and Mask...</sp-menu-item>
+                    <sp-menu-divider></sp-menu-divider>
+                    <sp-menu-item>Save Selection</sp-menu-item>
+                    <sp-menu-item disabled>Make Work Path</sp-menu-item>
+                </sp-action-menu>
+            `);
 
             expect(changeSpy.callCount).to.equal(0);
             expect(el.open).to.be.false;
@@ -200,27 +183,25 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
         it('closes when Menu Item has [href]', async () => {
             const changeSpy = spy();
 
-            const el = await fixture<ActionMenu>(
-                html`
-                    <sp-action-menu
-                        label="More Actions"
-                        @change=${() => {
-                            changeSpy();
-                        }}
-                    >
-                        <sp-icon-settings slot="icon"></sp-icon-settings>
-                        <sp-menu-item href="#">Deselect</sp-menu-item>
-                        <sp-menu-item href="#">Select Inverse</sp-menu-item>
-                        <sp-menu-item href="#">Feather...</sp-menu-item>
-                        <sp-menu-item href="#">Select and Mask...</sp-menu-item>
-                        <sp-menu-divider></sp-menu-divider>
-                        <sp-menu-item href="#">Save Selection</sp-menu-item>
-                        <sp-menu-item href="#" disabled>
-                            Make Work Path
-                        </sp-menu-item>
-                    </sp-action-menu>
-                `
-            );
+            const el = await fixture<ActionMenu>(html`
+                <sp-action-menu
+                    label="More Actions"
+                    @change=${() => {
+                        changeSpy();
+                    }}
+                >
+                    <sp-icon-settings slot="icon"></sp-icon-settings>
+                    <sp-menu-item href="#">Deselect</sp-menu-item>
+                    <sp-menu-item href="#">Select Inverse</sp-menu-item>
+                    <sp-menu-item href="#">Feather...</sp-menu-item>
+                    <sp-menu-item href="#">Select and Mask...</sp-menu-item>
+                    <sp-menu-divider></sp-menu-divider>
+                    <sp-menu-item href="#">Save Selection</sp-menu-item>
+                    <sp-menu-item href="#" disabled>
+                        Make Work Path
+                    </sp-menu-item>
+                </sp-action-menu>
+            `);
 
             expect(changeSpy.callCount).to.equal(0);
             expect(el.open).to.be.false;
@@ -300,106 +281,13 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
             const el = await actionMenuFixture();
 
             const button = el.button as HTMLButtonElement;
-            expect(button).to.have.attribute('aria-haspopup', 'true');
-            expect(button).to.not.have.attribute('aria-expanded', 'true');
-            expect(button).to.not.have.attribute('aria-controls', 'menu');
 
-            el.click();
+            button.click();
             await elementUpdated(el);
             expect(el.open).to.be.true;
             expect(button).to.have.attribute('aria-haspopup', 'true');
             expect(button).to.have.attribute('aria-expanded', 'true');
             expect(button).to.have.attribute('aria-controls', 'menu');
-        });
-        it('opens repeatedly with Menu in the correct location', async function () {
-            const el = await fixture<ActionMenu>(
-                iconOnly({
-                    ...iconOnly.args,
-                    align: 'end',
-                })
-            );
-
-            await elementUpdated(el);
-
-            el.focus();
-            await elementUpdated(el);
-            let opened = oneEvent(el, 'sp-opened');
-            await sendKeys({ press: 'ArrowRight' });
-            await sendKeys({ press: 'ArrowLeft' });
-            await sendKeys({ press: 'Space' });
-            await opened;
-
-            const firstRect = (
-                el as unknown as { overlayElement: Overlay }
-            ).overlayElement.dialogEl.getBoundingClientRect();
-
-            let closed = oneEvent(el, 'sp-closed');
-            await sendKeys({ press: 'Space' });
-            await closed;
-
-            opened = oneEvent(el, 'sp-opened');
-            await sendKeys({ press: 'Space' });
-            await opened;
-
-            const secondRect = (
-                el as unknown as { overlayElement: Overlay }
-            ).overlayElement.dialogEl.getBoundingClientRect();
-
-            closed = oneEvent(el, 'sp-closed');
-            await sendKeys({ press: 'Space' });
-            await closed;
-
-            expect(firstRect).to.deep.equal(secondRect);
-        });
-        it('opens and selects in a single pointer button interaction', async () => {
-            const el = await actionMenuFixture();
-            const thirdItem = el.querySelector(
-                'sp-menu-item:nth-of-type(3)'
-            ) as MenuItem;
-            const boundingRect = el.button.getBoundingClientRect();
-
-            expect(el.value).to.not.equal(thirdItem.value);
-            const opened = oneEvent(el, 'sp-opened');
-            await sendMouse({
-                steps: [
-                    {
-                        type: 'move',
-                        position: [
-                            boundingRect.x + boundingRect.width / 2,
-                            boundingRect.y + boundingRect.height / 2,
-                        ],
-                    },
-                    {
-                        type: 'down',
-                    },
-                ],
-            });
-            await opened;
-
-            const thirdItemRect = thirdItem.getBoundingClientRect();
-            const closed = oneEvent(el, 'sp-closed');
-            let selected = '';
-            el.addEventListener('change', (event: Event) => {
-                selected = (event.target as ActionMenu).value;
-            });
-            await sendMouse({
-                steps: [
-                    {
-                        type: 'move',
-                        position: [
-                            thirdItemRect.x + thirdItemRect.width / 2,
-                            thirdItemRect.y + thirdItemRect.height / 2,
-                        ],
-                    },
-                    {
-                        type: 'up',
-                    },
-                ],
-            });
-            await closed;
-
-            expect(el.open).to.be.false;
-            expect(selected).to.equal(thirdItem.value);
         });
         it('has attribute aria-describedby', async () => {
             const name = 'sp-picker';
@@ -420,7 +308,9 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
         it('opens unmeasured with deprecated syntax', async () => {
             const el = await deprecatedActionMenuFixture();
 
-            el.click();
+            const button = el.button as HTMLButtonElement;
+
+            button.click();
             await elementUpdated(el);
             expect(el.open).to.be.true;
         });
@@ -509,7 +399,7 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
                     });
                 }
             };
-            const root = await fixture<ActionMenu>(html`
+            const root = await styledFixture<ActionMenu>(html`
                 <sp-action-menu label="More Actions" @change=${handleChange}>
                     <sp-menu-item>One</sp-menu-item>
                     <sp-menu-item selected value="test" id="root-selected-item">
@@ -587,7 +477,7 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
         });
         it('shows tooltip', async function () {
             const openSpy = spy();
-            const el = await fixture<ActionMenu>(
+            const el = await styledFixture<ActionMenu>(
                 tooltipDescriptionAndPlacement(
                     tooltipDescriptionAndPlacement.args
                 )
@@ -607,7 +497,7 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
 
             expect(overlay.triggerElement === el.button).to.be.true;
             let open = oneEvent(tooltip, 'sp-opened');
-            await sendMouse({
+            sendMouse({
                 steps: [
                     {
                         position: [
@@ -624,7 +514,7 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
 
             const close = oneEvent(tooltip, 'sp-closed');
             open = oneEvent(el, 'sp-opened');
-            await sendMouse({
+            sendMouse({
                 steps: [
                     {
                         position: [
@@ -660,15 +550,12 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
 
             expect(openSpy.callCount).to.equal(1);
         });
-        it('opens, then closes, on subsequent clicks', async function () {
+        it('opens, then closes, on subsequent clicks', async () => {
             const el = await actionMenuFixture();
             const rect = el.getBoundingClientRect();
 
-            await nextFrame();
-            await nextFrame();
-
             const open = oneEvent(el, 'sp-opened');
-            await sendMouse({
+            sendMouse({
                 steps: [
                     {
                         position: [
@@ -686,7 +573,7 @@ export const testActionMenu = (mode: 'sync' | 'async'): void => {
             expect(el.open).to.be.true;
 
             const close = oneEvent(el, 'sp-closed');
-            await sendMouse({
+            sendMouse({
                 steps: [
                     {
                         position: [

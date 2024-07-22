@@ -178,24 +178,13 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
         this.focused = true;
     }
 
-    public override click(): void {
-        if (this.disabled) {
-            return;
-        }
-
-        this.toggle();
-    }
-
     public handleButtonBlur(): void {
         this.focused = false;
     }
 
     protected preventNextToggle: 'no' | 'maybe' | 'yes' = 'no';
 
-    protected handleButtonPointerdown(event: PointerEvent): void {
-        if (event.button !== 0) {
-            return;
-        }
+    protected handleButtonPointerdown(): void {
         this.preventNextToggle = 'maybe';
         let cleanupAction = 0;
         const cleanup = (): void => {
@@ -213,7 +202,6 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
         // Ensure that however the pointer goes up we do `cleanup()`.
         document.addEventListener('pointerup', cleanup);
         document.addEventListener('pointercancel', cleanup);
-        this.handleButtonClick();
     }
 
     protected handleButtonFocus(event: FocusEvent): void {
@@ -227,7 +215,7 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
         }
     }
 
-    protected handleButtonClick = (): void => {
+    protected handleButtonClick(): void {
         if (this.enterKeydownOn && this.enterKeydownOn !== this.button) {
             return;
         }
@@ -235,7 +223,7 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
             return;
         }
         this.toggle();
-    };
+    }
 
     public override focus(options?: FocusOptions): void {
         super.focus(options);
@@ -380,31 +368,6 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
             | undefined;
     }
 
-    protected handleBeforetoggle(
-        event: Event & {
-            target: Overlay;
-            newState: 'open' | 'closed';
-        }
-    ): void {
-        if (event.composedPath()[0] !== event.target) {
-            return;
-        }
-        if (event.newState === 'closed') {
-            if (this.preventNextToggle === 'no') {
-                this.open = false;
-            } else if (!this.pointerdownState) {
-                // Prevent browser driven closure while opening the Picker
-                // and the expected event series has not completed.
-                this.overlayElement.manuallyKeepOpen();
-            }
-            this._selfManageFocusElement = false;
-        }
-        if (!this.open) {
-            this.optionsMenu.updateSelectedItemIndex();
-            this.optionsMenu.closeDescendentOverlays();
-        }
-    }
-
     protected handleSlottableRequest = (
         _event: SlottableRequestEvent
     ): void => {};
@@ -512,16 +475,29 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
         return html`
             <sp-overlay
                 @slottable-request=${this.handleSlottableRequest}
-                @beforetoggle=${this.handleBeforetoggle}
                 .triggerElement=${this as HTMLElement}
                 .offset=${0}
                 ?open=${this.open && this.dependencyManager.loaded}
                 .placement=${this.isMobile.matches ? undefined : this.placement}
                 .type=${this.isMobile.matches ? 'modal' : 'auto'}
                 .receivesFocus=${'true'}
-                .willPreventClose=${this.preventNextToggle !== 'no' &&
-                this.open &&
-                this.dependencyManager.loaded}
+                @beforetoggle=${(
+                    event: Event & {
+                        target: Overlay;
+                        newState: 'open' | 'closed';
+                    }
+                ) => {
+                    if (event.composedPath()[0] !== event.target) {
+                        return;
+                    }
+                    if (event.newState === 'closed') {
+                        this.open = false;
+                    }
+                    if (!this.open) {
+                        this.optionsMenu.updateSelectedItemIndex();
+                        this.optionsMenu.closeDescendentOverlays();
+                    }
+                }}
             >
                 ${container}
             </sp-overlay>
@@ -563,6 +539,7 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
                 @blur=${this.handleButtonBlur}
                 @pointerdown=${this.handleButtonPointerdown}
                 @focus=${this.handleButtonFocus}
+                @click=${this.handleButtonClick}
                 @keydown=${{
                     handleEvent: this.handleEnterKeydown,
                     capture: true,
@@ -811,25 +788,19 @@ export class PickerBase extends SizedMixin(Focusable, { noDefaultSize: true }) {
         if (this.enterKeydownOn) {
             event.preventDefault();
             return;
+        } else {
+            this.addEventListener(
+                'keyup',
+                (keyupEvent: KeyboardEvent) => {
+                    if (keyupEvent.code !== 'Enter') {
+                        return;
+                    }
+                    this.enterKeydownOn = null;
+                },
+                { once: true }
+            );
         }
-        this.enterKeydownOn = event.target;
-        if (this.enterKeydownOn === this.button) {
-            this.button.addEventListener('click', this.handleButtonClick);
-        }
-        this.addEventListener(
-            'keyup',
-            (keyupEvent: KeyboardEvent) => {
-                if (keyupEvent.code !== 'Enter') {
-                    return;
-                }
-                this.enterKeydownOn = null;
-                this.button.removeEventListener(
-                    'click',
-                    this.handleButtonClick
-                );
-            },
-            { once: true }
-        );
+        this.enterKeydownOn = this.enterKeydownOn || event.target;
     };
 
     public override connectedCallback(): void {
