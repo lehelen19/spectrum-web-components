@@ -11,3 +11,8 @@ governing permissions and limitations under the License.
 */
 
 @import url('./spectrum-modal-wrapper.css');
+
+:host {
+    block-size: -moz-available;
+    block-size: -webkit-fill-available;
+}
